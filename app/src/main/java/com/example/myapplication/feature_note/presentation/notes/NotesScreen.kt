@@ -1,11 +1,16 @@
 package com.example.myapplication.feature_note.presentation.notes
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
@@ -40,23 +45,29 @@ fun NotesScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
+                    .padding(16.dp)
             ) {
                 if (state.isLoading) {
-                    CircularProgressIndicator(modifier = Modifier
-                        .size(70.dp)
-                        .align(Center))
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(70.dp)
+                            .align(Center)
+                    )
                 } else {
                     Column(
                         modifier = Modifier.fillMaxSize()
+
                     ) {
-                        LazyColumn {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
                             items(state.notes) { note ->
                                 NoteItem(note)
                             }
                         }
                     }
                 }
-
             }
 
         })
@@ -70,9 +81,9 @@ fun NotesScreenPreview() {
     NotesScreen(
         state = NotesState(
             notes = listOf(
-                Note(null, "Note 1", "content", 1, 1), Note(null, "Note 2", "content", 1, 1)
-            ),
-            isLoading = false
+                Note(null, "Note 1", "content", 1, -749647),
+                Note(null, "Note 2", "content", 1, -21615)
+            ), isLoading = false
         )
     ) {
 

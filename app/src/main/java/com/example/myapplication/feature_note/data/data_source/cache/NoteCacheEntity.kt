@@ -7,7 +7,7 @@ import com.example.myapplication.feature_note.domain.model.Note
 @Entity(tableName = "notes")
 data class NoteCacheEntity(
 
-    @PrimaryKey(autoGenerate = true) val id: Int?,
+    @PrimaryKey val id: Int?,
     val title: String,
     val content: String,
     val timeStamp: Long,

@@ -3,8 +3,11 @@ package com.example.myapplication
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,7 +27,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        println("yash")
         setContent {
             MyApplicationTheme {
                 Surface(
@@ -49,14 +51,7 @@ class MainActivity : ComponentActivity() {
                         composable(Screen.AddEditNoteScreen.route) {
                             val addEditNoteVm = hiltViewModel<AddEditNoteViewModel>()
                             AddEditNoteScreen(addEditNoteVm.state){ event->
-                                when(event){
-                                    AddEditNotesEvent.RestoreNote -> {
-                                    }
-                                    AddEditNotesEvent.SaveNote -> {
-
-                                    }
-                                }
-
+                                addEditNoteVm.onEvent(event)
                             }
                         }
                     }
