@@ -6,7 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.currencyconvertor.feature_currency.data.util.DataState
-import com.example.currencyconvertor.feature_currency.domain.use_case.CurrencyUseCases
+import com.example.currencyconvertor.feature_currency.domain.repository.CurrencyRepository
+import com.example.currencyconvertor.feature_currency.util.printLogD
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -14,22 +15,43 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class NoteViewModel @Inject constructor(
-    private val currencyUseCases: CurrencyUseCases
+class CurrencyViewModel @Inject constructor(
+    private val currencyRepository: CurrencyRepository
 ) : ViewModel() {
 
     var state by mutableStateOf(CurrencyUIState())
         private set
     private var getCurrenciesJob: Job? = null
-    private var convertCurrenyJob: Job? = null
+    private var convertCurrencyJob: Job? = null
 
-    init {
-        getNotes()
+    fun onEvent(event: CurrencyEvent) {
+        printLogD("vm", " onEvent, : $event")
+        when (event) {
+            is CurrencyEvent.GetCurrencies -> {
+                getCurrencies()
+            }
+
+            is CurrencyEvent.AmountChanged -> {
+                state = state.copy(
+                    amount = event.amount
+                )
+                convertCurrency()
+            }
+
+            is CurrencyEvent.OnItemSelected -> {
+                event.currencyModel?.let {
+                    state = state.copy(
+                        selectedCurrencyCode = it.code
+                    )
+                }
+                convertCurrency()
+            }
+        }
     }
 
-    private fun getNotes() {
+    private fun getCurrencies() {
         getCurrenciesJob?.cancel()
-        getCurrenciesJob = currencyUseCases.getCurrenciesUseCase().onEach {
+        getCurrenciesJob = currencyRepository.getCurrencies().onEach {
             when (it) {
                 is DataState.Error -> {
 
@@ -37,7 +59,7 @@ class NoteViewModel @Inject constructor(
 
                 is DataState.Success -> {
                     state = state.copy(
-                        currencyModels = it.data, isLoading = false
+                        currencies = it.data, isLoading = false
                     )
                     onEvent(CurrencyEvent.OnItemSelected(it.data.getOrNull(0)))
                 }
@@ -45,16 +67,14 @@ class NoteViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-
     private fun convertCurrency() {
-        convertCurrenyJob?.cancel()
-        val amount = state.amount
+        convertCurrencyJob?.cancel()
+        val amount = state.amount.ifBlank { "0.0" }
         val currencyCode = state.selectedCurrencyCode
 
-        if (amount.isNotBlank() && currencyCode.isNotBlank()) {
-
-            convertCurrenyJob =
-                currencyUseCases.getCurrencyRateUseCase(amount.toDouble(), currencyCode).onEach {
+        if (currencyCode.isNotBlank()) {
+            convertCurrencyJob =
+                currencyRepository.getCurrencyRates(amount.toDouble(), currencyCode).onEach {
                     when (it) {
                         is DataState.Error -> {
 
@@ -62,33 +82,14 @@ class NoteViewModel @Inject constructor(
 
                         is DataState.Success -> {
                             state = state.copy(
-                                currencyRateModel = it.data
+                                convertedRates = it.data
                             )
                         }
                     }
                 }.launchIn(viewModelScope)
-
         }
     }
 
-    fun onEvent(event: CurrencyEvent) {
-       when (event) {
-            is CurrencyEvent.AmountChange -> {
-                state = state.copy(
-                    amount = event.amount
-                )
-            }
-
-            is CurrencyEvent.OnItemSelected -> {
-                event.currencyModel?.let {
-                   state = state.copy(
-                        selectedCurrencyCode = it.code
-                    )
-                }
-            }
-        }
-        convertCurrency()
-    }
 }
 
 

@@ -19,10 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -60,23 +56,20 @@ fun NotesScreen(
                         .padding(vertical = 4.dp),
                     value = state.amount,
                     onValueChange = {
-                        if (it.contains(",") || it.toCharArray().count { letter ->
-                                letter == '.'
-                            } > 1) {
+                        if (!isValidAmount(it)) {
                             return@TextField
                         }
-                        onEvent(CurrencyEvent.AmountChange(it))
+                        onEvent(CurrencyEvent.AmountChanged(it))
                     },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    textStyle = MaterialTheme.typography.bodyLarge,
+                    textStyle = MaterialTheme.typography.titleLarge,
                     label = { Text(stringResource(R.string.amount)) },
                     shape = RoundedCornerShape(6.dp)
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 CurrencySelector(
-                    modifier = Modifier,
-                    state = state
+                    modifier = Modifier, state = state
                 ) {
                     onEvent(CurrencyEvent.OnItemSelected(it))
                 }
@@ -88,7 +81,7 @@ fun NotesScreen(
 
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    items(state.currencyRateModel) { currencyRateModel ->
+                    items(state.convertedRates) { currencyRateModel ->
                         CurrencyConvertorItem(
                             modifier = Modifier.fillMaxSize(), currencyRateModel = currencyRateModel
                         )
@@ -99,22 +92,29 @@ fun NotesScreen(
     }
 }
 
+private fun isValidAmount(amount: String): Boolean {
+    val dotCount = amount.toCharArray().count { char ->
+        char == '.'
+    }
+    return !(dotCount > 1 || amount.contains(",") || amount.firstOrNull() == '.')
+}
+
 @Composable
 @Preview(showBackground = true)
 fun NotesScreenPreview() {
     NotesScreen(
         state = CurrencyUIState(
-            currencyModels = listOf(
+            currencies = listOf(
                 CurrencyModel(
                     code = "Code", name = "USD"
                 )
             ),
-            currencyRateModel = listOf(
+            convertedRates = listOf(
                 CurrencyRateModel(
                     rate = 1.1, code = "USD"
                 ),
                 CurrencyRateModel(
-                    rate =5.1, code = "PKR"
+                    rate = 5.1, code = "PKR"
                 ),
                 CurrencyRateModel(
                     rate = 1.5, code = "INR"

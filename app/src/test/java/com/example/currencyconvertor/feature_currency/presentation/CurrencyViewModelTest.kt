@@ -1,0 +1,95 @@
+package com.example.currencyconvertor.feature_currency.presentation
+
+import com.example.currencyconvertor.feature_currency.data.util.FakeCurrencyRepository
+import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
+import com.example.currencyconvertor.feature_currency.util.MainDispatcherRule
+import com.example.currencyconvertor.feature_currency.util.UnitTestRule
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+
+class CurrencyViewModelTest {
+
+    @get:Rule
+    val dispatcherRule = MainDispatcherRule()
+
+    @get:Rule
+    val unitTestRule = UnitTestRule()
+
+    private val currencyRepository = FakeCurrencyRepository()
+    private lateinit var currencyViewModel: CurrencyViewModel
+
+
+    @Before
+    fun setup() {
+        currencyViewModel = CurrencyViewModel(currencyRepository)
+
+    }
+
+    @Test
+    fun gsdsd() = runTest {
+
+        currencyViewModel.onEvent(CurrencyEvent.GetCurrencies)
+        val currencies = currencyViewModel.state.currencies
+
+        assertEquals("Dollar",currencies[0].name )
+    }
+
+    @Test
+    fun gsdsdasas() = runTest {
+
+        currencyViewModel.onEvent(CurrencyEvent.GetCurrencies)
+        currencyViewModel.onEvent(
+            CurrencyEvent.OnItemSelected(
+                CurrencyModel(
+                    code = "INR", name = "Rupee"
+                )
+            )
+        )
+        val selectedCurrencyCode = currencyViewModel.state.selectedCurrencyCode
+
+        assertEquals("INR", selectedCurrencyCode)
+    }
+
+    @Test
+    fun defaultValues() = runTest {
+
+        val state = currencyViewModel.state
+
+        assertEquals("", state.selectedCurrencyCode)
+        assertEquals("", state.amount)
+        assertEquals(true, state.isLoading)
+        assertEquals(0, state.currencies.size)
+        assertEquals(0, state.convertedRates.size)
+    }
+
+    @Test
+    fun gsdsdasasasas() = runTest {
+
+        currencyViewModel.onEvent(CurrencyEvent.GetCurrencies)
+        currencyViewModel.onEvent(CurrencyEvent.AmountChanged(amount = "10.0"))
+       val amountSelected = currencyViewModel.state.amount
+
+        assertEquals("10.0", amountSelected)
+    }
+
+    @Test
+    fun gsdsdasasasasasdadas() = runTest {
+
+        currencyViewModel.onEvent(CurrencyEvent.GetCurrencies)
+        currencyViewModel.onEvent(CurrencyEvent.AmountChanged(amount = "10.0"))
+        currencyViewModel.onEvent(
+            CurrencyEvent.OnItemSelected(
+                CurrencyModel(
+                    code = "INR", name = "Rupee"
+                )
+            )
+        )
+        val convertedRateInr = currencyViewModel.state.convertedRates.find { it.code == "INR" }?.rate
+
+        assertEquals(80.0, convertedRateInr)
+    }
+
+}

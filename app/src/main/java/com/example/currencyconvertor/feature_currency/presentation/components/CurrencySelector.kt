@@ -42,14 +42,14 @@ fun CurrencySelector(
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
             })
         ExposedDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
-            state.currencyModels.forEachIndexed { index, item ->
+            state.currencies.forEachIndexed { index, item ->
                 DropdownMenuItem(
                     text = {
                         Text(text = item.name)
                     },
                     onClick = {
                         isExpanded = false
-                        onItemSelected(state.currencyModels[index])
+                        onItemSelected(state.currencies[index])
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                 )
@@ -65,7 +65,7 @@ fun CurrencySelector(
 private fun CurrencySelectorPreview() {
     CurrencySelector(
         state = CurrencyUIState(
-            currencyModels = listOf(
+            currencies = listOf(
                 CurrencyModel(
                     code = "USD", name = "United States Dollar"
                 )

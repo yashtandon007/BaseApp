@@ -18,6 +18,7 @@ class CurrencyRepositoryImpl @Inject constructor(
 ) : CurrencyRepository {
 
     override fun getCurrencies() = flow {
+        printLogD("repo", " getCurrencies...")
         if (currencyCacheDataSource.getCurrencies().isEmpty()) {
             val networkResult = safeApiCall {
                 currencyNetworkDataSource.getCurrencies()
@@ -47,6 +48,7 @@ class CurrencyRepositoryImpl @Inject constructor(
         amount: Double, currencyCode: String
     ) = flow {
 
+        printLogD("repo", " getCurrencyRates...")
         if (currencyCacheDataSource.getCurrenciesRates().isEmpty()) {
 
             val networkResult = safeApiCall {
@@ -83,7 +85,6 @@ class CurrencyRepositoryImpl @Inject constructor(
         val conversionRate = 1.0.div(currencyRates.first {
             it.code == currencyCode
         }.rate)
-        printLogD("repository", " conversionRate, : $conversionRate")
         return currencyRates.map {
             CurrencyRateModel(
                 rate = it.rate.times(conversionRate).times(amount),

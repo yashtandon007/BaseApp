@@ -24,15 +24,13 @@ class CurrencyRepositoryTest {
     @get:Rule
     val unitTestRule = UnitTestRule()
 
+    private  var currencyCacheDataSource  = FakeCurrencyCacheDataSourceImpl()
+    private  var currencyNetworkDataSource = FakeCurrencyNetworkDataSourceImpl()
     private lateinit var currencyRepositoryImpl: CurrencyRepositoryImpl
-    private lateinit var currencyCacheDataSource: FakeCurrencyCacheDataSourceImpl
-    private lateinit var currencyNetworkDataSource: FakeCurrencyNetworkDataSourceImpl
 
     @Before
     fun setup() {
-        currencyNetworkDataSource = FakeCurrencyNetworkDataSourceImpl()
-        currencyCacheDataSource = FakeCurrencyCacheDataSourceImpl()
-        currencyRepositoryImpl = CurrencyRepositoryImpl(
+         currencyRepositoryImpl = CurrencyRepositoryImpl(
             currencyCacheDataSource, currencyNetworkDataSource
         )
     }
@@ -77,11 +75,11 @@ class CurrencyRepositoryTest {
 
         val inrRate = (result as DataState.Success).data.find { it.code == "INR" }?.rate
 
-        assertEquals(inrRate, 80.0)
+        assertEquals(80.0,inrRate)
 
         val usdRate = result.data.find { it.code == "USD" }?.rate
 
-        assertEquals(usdRate, 1.0)
+        assertEquals(1.0,usdRate)
 
     }
 
@@ -96,7 +94,7 @@ class CurrencyRepositoryTest {
         ).first()
 
         assertTrue(result is DataState.Error)
-        assertEquals((result as DataState.Error).message, NETWORK_ERROR_UNKNOWN)
+        assertEquals(NETWORK_ERROR_UNKNOWN,(result as DataState.Error).message)
         assertTrue(currencyCacheDataSource.getCurrencies().isEmpty())
 
     }
@@ -112,7 +110,7 @@ class CurrencyRepositoryTest {
 
         assertTrue(result is DataState.Success)
 
-        assertEquals((result as DataState.Success).data.first().code, "USD")
+        assertEquals("USD",(result as DataState.Success).data.first().code)
 
     }
 
@@ -129,11 +127,11 @@ class CurrencyRepositoryTest {
 
         val inrRate = (result as DataState.Success).data.find { it.code == "INR" }?.rate
 
-        assertEquals(inrRate, 80.0)
+        assertEquals(80.0,inrRate)
 
         val usdRate = result.data.find { it.code == "USD" }?.rate
 
-        assertEquals(usdRate, 1.0)
+        assertEquals(1.0,usdRate)
 
     }
 
@@ -148,7 +146,7 @@ class CurrencyRepositoryTest {
         ).first()
 
         assertTrue(result is DataState.Error)
-        assertEquals((result as DataState.Error).message, NETWORK_ERROR_UNKNOWN)
+        assertEquals(NETWORK_ERROR_UNKNOWN,(result as DataState.Error).message)
     }
 
     @Test
@@ -160,6 +158,6 @@ class CurrencyRepositoryTest {
         val result = currencyRepositoryImpl.getCurrencies().first()
 
         assertTrue(result is DataState.Error)
-        assertEquals((result as DataState.Error).message, NETWORK_ERROR_UNKNOWN)
+        assertEquals(NETWORK_ERROR_UNKNOWN,(result as DataState.Error).message)
     }
 }
