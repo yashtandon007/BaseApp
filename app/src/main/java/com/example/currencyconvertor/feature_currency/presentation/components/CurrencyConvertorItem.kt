@@ -31,14 +31,14 @@ fun CurrencyConvertorItem(
         ) {
 
             Text(
-                text = currencyRateModel.amount,
+                text = currencyRateModel.rate.toString(),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = currencyRateModel.currencyCode,
+                text = currencyRateModel.code,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
@@ -54,7 +54,7 @@ fun CurrencyConvertorItem(
 private fun CurrencyConvertorItemPreview() {
     CurrencyConvertorItem(
         currencyRateModel = CurrencyRateModel(
-            currencyCode = "USD",
-            amount = "1.1")
+            code = "USD",
+            rate = 1.1)
     )
 }

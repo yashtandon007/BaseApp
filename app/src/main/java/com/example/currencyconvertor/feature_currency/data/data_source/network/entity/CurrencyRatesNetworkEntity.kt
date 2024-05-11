@@ -1,4 +1,4 @@
-package com.example.currencyconvertor.feature_currency.data.data_source.network
+package com.example.currencyconvertor.feature_currency.data.data_source.network.entity
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

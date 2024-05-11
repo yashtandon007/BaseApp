@@ -1,5 +1,6 @@
 package com.example.currencyconvertor.feature_currency.data.data_source.network
 
+import com.example.currencyconvertor.feature_currency.data.data_source.network.entity.CurrencyRatesNetworkEntity
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

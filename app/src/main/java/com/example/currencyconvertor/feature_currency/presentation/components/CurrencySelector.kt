@@ -14,21 +14,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
+import com.example.currencyconvertor.feature_currency.presentation.CurrencyUIState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencySelector(
-    items: List<CurrencyModel>,
+    state: CurrencyUIState,
     modifier: Modifier = Modifier,
     onItemSelected: (CurrencyModel) -> Unit
 ) {
 
     var isExpanded by remember {
         mutableStateOf(false)
-    }
-    var selectedItem by remember {
-        mutableStateOf(items[0])
     }
 
     ExposedDropdownMenuBox(
@@ -38,21 +36,20 @@ fun CurrencySelector(
 
         TextField(modifier = Modifier.menuAnchor(),
             onValueChange = { },
-            value = selectedItem.code,
+            value = state.selectedCurrencyCode,
             readOnly = true,
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
             })
         ExposedDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
-            items.forEachIndexed { index, item ->
+            state.currencyModels.forEachIndexed { index, item ->
                 DropdownMenuItem(
                     text = {
                         Text(text = item.name)
                     },
                     onClick = {
-                        selectedItem = items[index]
                         isExpanded = false
-                        onItemSelected(items[index])
+                        onItemSelected(state.currencyModels[index])
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                 )
@@ -67,10 +64,12 @@ fun CurrencySelector(
 @Composable
 private fun CurrencySelectorPreview() {
     CurrencySelector(
-        listOf(
-            CurrencyModel(
-                code = "USD", name = "United States Dollar"
+        state = CurrencyUIState(
+            currencyModels = listOf(
+                CurrencyModel(
+                    code = "USD", name = "United States Dollar"
+                )
             )
-        ), onItemSelected = {}
+        , selectedCurrencyCode = "USD"), onItemSelected = {}
     )
 }

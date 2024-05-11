@@ -1,12 +1,11 @@
 package com.example.currencyconvertor.feature_currency.presentation
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.currencyconvertor.feature_currency.data.data_source.DataState
+import com.example.currencyconvertor.feature_currency.data.util.DataState
 import com.example.currencyconvertor.feature_currency.domain.use_case.CurrencyUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -50,17 +49,10 @@ class NoteViewModel @Inject constructor(
     private fun convertCurrency() {
         convertCurrenyJob?.cancel()
         val amount = state.amount
-        val currencyCode = state.currencyCode
+        val currencyCode = state.selectedCurrencyCode
 
-        Log.e(
-            "yashtandon",
-            "convertCurrency amount : ${state.amount}  convertCurrency:currencyCode : ${state.currencyCode} ",
-        )
         if (amount.isNotBlank() && currencyCode.isNotBlank()) {
-            Log.e(
-                "yashtandon",
-                "convertCurrency amount : ${state.amount}  convertCurrency:currencyCode : ${state.currencyCode} ",
-            )
+
             convertCurrenyJob =
                 currencyUseCases.getCurrencyRateUseCase(amount.toDouble(), currencyCode).onEach {
                     when (it) {
@@ -80,8 +72,7 @@ class NoteViewModel @Inject constructor(
     }
 
     fun onEvent(event: CurrencyEvent) {
-        Log.e("yashtandon", "onEvent: $event ")
-        when (event) {
+       when (event) {
             is CurrencyEvent.AmountChange -> {
                 state = state.copy(
                     amount = event.amount
@@ -91,12 +82,11 @@ class NoteViewModel @Inject constructor(
             is CurrencyEvent.OnItemSelected -> {
                 event.currencyModel?.let {
                    state = state.copy(
-                        currencyCode = it.code
+                        selectedCurrencyCode = it.code
                     )
                 }
             }
         }
-        Log.e("yashtandon", "convertCurrency: ")
         convertCurrency()
     }
 }

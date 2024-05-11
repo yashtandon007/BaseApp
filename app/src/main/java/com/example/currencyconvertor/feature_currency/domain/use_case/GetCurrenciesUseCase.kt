@@ -1,6 +1,6 @@
 package com.example.currencyconvertor.feature_currency.domain.use_case
 
-import com.example.currencyconvertor.feature_currency.data.data_source.DataState
+import com.example.currencyconvertor.feature_currency.data.util.DataState
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
 import com.example.currencyconvertor.feature_currency.domain.repository.CurrencyRepository
 import kotlinx.coroutines.flow.Flow

@@ -1,4 +1,4 @@
-package com.example.currencyconvertor.feature_currency.data.data_source.cache
+package com.example.currencyconvertor.feature_currency.data.data_source.cache.entity
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
@@ -13,13 +13,10 @@ data class CurrencyRateEntity(
     var id: Int = 0,
 
     @ColumnInfo(name = "currency_code")
-    val currencyCode: String,
+    val code: String,
 
     @ColumnInfo(name = "currency_value")
-    val amount: Double,
-
-    @ColumnInfo(name = "time_stamp")
-    val timestamp: Int = 0
+    val rate: Double
 
 ) : Parcelable {
     companion object {

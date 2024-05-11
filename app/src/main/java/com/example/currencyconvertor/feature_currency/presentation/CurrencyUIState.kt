@@ -8,5 +8,5 @@ data class CurrencyUIState(
     val currencyRateModel: List<CurrencyRateModel> = listOf(),
     val isLoading: Boolean = true,
     val amount: String = "",
-    val currencyCode: String = "",
+    val selectedCurrencyCode: String = "",
 )

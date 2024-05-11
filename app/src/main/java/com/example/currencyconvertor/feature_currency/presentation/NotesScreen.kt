@@ -39,10 +39,6 @@ import com.example.currencyconvertor.feature_currency.presentation.components.Cu
 fun NotesScreen(
     state: CurrencyUIState, onEvent: (CurrencyEvent) -> Unit
 ) {
-
-    var amount by remember {
-        mutableStateOf("")
-    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -62,14 +58,13 @@ fun NotesScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
-                    value = amount,
+                    value = state.amount,
                     onValueChange = {
                         if (it.contains(",") || it.toCharArray().count { letter ->
                                 letter == '.'
                             } > 1) {
                             return@TextField
                         }
-                        amount = it
                         onEvent(CurrencyEvent.AmountChange(it))
                     },
                     singleLine = true,
@@ -80,7 +75,8 @@ fun NotesScreen(
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 CurrencySelector(
-                    modifier = Modifier, items = state.currencyModels
+                    modifier = Modifier,
+                    state = state
                 ) {
                     onEvent(CurrencyEvent.OnItemSelected(it))
                 }
@@ -101,10 +97,7 @@ fun NotesScreen(
             }
         }
     }
-
-
 }
-
 
 @Composable
 @Preview(showBackground = true)
@@ -118,16 +111,16 @@ fun NotesScreenPreview() {
             ),
             currencyRateModel = listOf(
                 CurrencyRateModel(
-                    amount = "1.1", currencyCode = "USD"
+                    rate = 1.1, code = "USD"
                 ),
                 CurrencyRateModel(
-                    amount = "5.1", currencyCode = "PKR"
+                    rate =5.1, code = "PKR"
                 ),
                 CurrencyRateModel(
-                    amount = "1.5", currencyCode = "INR"
+                    rate = 1.5, code = "INR"
                 ),
                 CurrencyRateModel(
-                    amount = "2.1", currencyCode = "AUD"
+                    rate = 2.1, code = "AUD"
                 ),
             ),
             isLoading = false,

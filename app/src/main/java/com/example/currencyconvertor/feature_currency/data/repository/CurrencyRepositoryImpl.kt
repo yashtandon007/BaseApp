@@ -1,80 +1,95 @@
 package com.example.currencyconvertor.feature_currency.data.repository
 
-import android.util.Log
-import com.example.currencyconvertor.feature_currency.data.data_source.DataState
-import com.example.currencyconvertor.feature_currency.data.data_source.cache.CurrencyDao
-import com.example.currencyconvertor.feature_currency.data.data_source.cache.CurrencyRateEntity
-import com.example.currencyconvertor.feature_currency.data.data_source.network.ApiService
-import com.example.currencyconvertor.feature_currency.data.data_source.network.CurrencyNetworkEntity
-import com.example.currencyconvertor.feature_currency.data.data_source.toCacheEntity
-import com.example.currencyconvertor.feature_currency.data.data_source.toCurrencyModel
-import com.example.currencyconvertor.feature_currency.data.data_source.toCurrencyRateModel
-import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
+import com.example.currencyconvertor.feature_currency.data.data_source.cache.abstraction.CurrencyCacheDataSource
+import com.example.currencyconvertor.feature_currency.data.data_source.network.NetworkResult
+import com.example.currencyconvertor.feature_currency.data.data_source.network.abstraction.CurrencyNetworkDataSource
+import com.example.currencyconvertor.feature_currency.data.util.DataState
+import com.example.currencyconvertor.feature_currency.data.util.safeApiCall
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyRateModel
 import com.example.currencyconvertor.feature_currency.domain.repository.CurrencyRepository
-import kotlinx.coroutines.flow.Flow
+import com.example.currencyconvertor.feature_currency.util.printLogD
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class CurrencyRepositoryImpl(
-    private val currencyDao: CurrencyDao, private val apiService: ApiService
-
+class CurrencyRepositoryImpl @Inject constructor(
+    private val currencyCacheDataSource: CurrencyCacheDataSource,
+    private val currencyNetworkDataSource: CurrencyNetworkDataSource
 ) : CurrencyRepository {
 
-    override fun getCurrencies(): Flow<DataState<List<CurrencyModel>>> =
-        flow<DataState<List<CurrencyModel>>> {
-            if (currencyDao.getCurrencies().isEmpty()) {
-                apiService.getCurrencies().body()?.let { currency ->
-                    val currencyList = currency.map { model ->
-                        CurrencyNetworkEntity(
-                            code = model.key,
-                            name = model.value,
-                            timeStamp = System.currentTimeMillis()
-                        )
-                    }
-                    currencyDao.insetCurrencies(currencyList.sortedBy { it.name }.toCacheEntity())
-                    emit(DataState.Success(currencyDao.getCurrencies().toCurrencyModel()))
+    override fun getCurrencies() = flow {
+        if (currencyCacheDataSource.getCurrencies().isEmpty()) {
+            val networkResult = safeApiCall {
+                currencyNetworkDataSource.getCurrencies()
+            }
+            when (networkResult) {
+                is NetworkResult.Success -> {
+                    currencyCacheDataSource.insetCurrencies(networkResult.data.sortedBy { it.name })
+                    emit(DataState.Success(currencyCacheDataSource.getCurrencies()))
                 }
-            } else {
-                emit(DataState.Success(currencyDao.getCurrencies().toCurrencyModel()))
+
+                is NetworkResult.GenericError -> {
+                    printLogD("repository", "n/w error $networkResult")
+                    emit(DataState.Error(networkResult.errorMessage))
+                }
             }
-        }.catch {
-            emit(DataState.Error(it.message.toString()))
-        }
-
-    override fun getCurrencyRates(
-        amount: Double, currencyCode: String
-    ): Flow<DataState<List<CurrencyRateModel>>> = flow<DataState<List<CurrencyRateModel>>> {
-
-        if (currencyDao.getCurrenciesRates().isEmpty()) {
-
-            apiService.getCurrencyRates().body()?.let {
-                Log.e("yashtandon", "response: $it")
-                currencyDao.insertCurrencyRates(it.toCacheEntity())
-                val currencyRates =
-                    getCurrencyRates(amount, currencyCode, currencyDao.getCurrenciesRates())
-                emit(DataState.Success(currencyRates))
-            }
-
         } else {
-            val currencyRates =
-                getCurrencyRates(amount, currencyCode, currencyDao.getCurrenciesRates())
-            emit(DataState.Success(currencyRates))
+            val currencies = currencyCacheDataSource.getCurrencies()
+            printLogD("repository", "currencies success , data size:  ${currencies.size}")
+            emit(DataState.Success(currencies))
         }
-
     }.catch {
-        Log.e("yashtandon", "err:${it.message.toString()} ")
+        printLogD("repository", " error, msg: ${it.message}")
         emit(DataState.Error(it.message.toString()))
     }
 
-    private fun getCurrencyRates(
-        amount: Double, currencyCode: String, currencyRates: List<CurrencyRateEntity>
+    override fun getCurrencyRates(
+        amount: Double, currencyCode: String
+    ) = flow {
+
+        if (currencyCacheDataSource.getCurrenciesRates().isEmpty()) {
+
+            val networkResult = safeApiCall {
+                currencyNetworkDataSource.getCurrencyRates()
+            }
+            when (networkResult) {
+                is NetworkResult.Success -> {
+                    currencyCacheDataSource.insertCurrencyRates(networkResult.data)
+                    val convertedRates = getConvertedRates(
+                        amount, currencyCode, currencyCacheDataSource.getCurrenciesRates()
+                    )
+                    emit(DataState.Success(convertedRates))
+                }
+
+                is NetworkResult.GenericError -> {
+                    emit(DataState.Error(networkResult.errorMessage))
+                }
+            }
+        } else {
+            val convertedRates = getConvertedRates(
+                amount, currencyCode, currencyCacheDataSource.getCurrenciesRates()
+            )
+            emit(DataState.Success(convertedRates))
+        }
+
+    }.catch {
+        emit(DataState.Error(it.message.toString()))
+    }
+
+    private fun getConvertedRates(
+        amount: Double, currencyCode: String, currencyRates: List<CurrencyRateModel>
     ): List<CurrencyRateModel> {
 
-        val conversionRate = currencyRates.first {
-            it.currencyCode == currencyCode
-        }.amount
-        return currencyRates.toCurrencyRateModel(amount,conversionRate)
+        val conversionRate = 1.0.div(currencyRates.first {
+            it.code == currencyCode
+        }.rate)
+        printLogD("repository", " conversionRate, : $conversionRate")
+        return currencyRates.map {
+            CurrencyRateModel(
+                rate = it.rate.times(conversionRate).times(amount),
+                code = it.code
+            )
+        }
     }
 
 }

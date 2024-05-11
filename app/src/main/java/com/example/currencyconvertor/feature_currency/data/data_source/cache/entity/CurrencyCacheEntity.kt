@@ -1,4 +1,4 @@
-package com.example.currencyconvertor.feature_currency.data.data_source.cache
+package com.example.currencyconvertor.feature_currency.data.data_source.cache.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
