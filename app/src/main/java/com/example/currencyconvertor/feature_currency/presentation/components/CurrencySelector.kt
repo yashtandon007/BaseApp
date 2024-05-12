@@ -20,9 +20,7 @@ import com.example.currencyconvertor.feature_currency.presentation.CurrencyUISta
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencySelector(
-    state: CurrencyUIState,
-    modifier: Modifier = Modifier,
-    onItemSelected: (CurrencyModel) -> Unit
+    state: CurrencyUIState, modifier: Modifier = Modifier, onItemSelected: (CurrencyModel) -> Unit
 ) {
 
     var isExpanded by remember {
@@ -34,24 +32,23 @@ fun CurrencySelector(
         expanded = isExpanded,
         onExpandedChange = { isExpanded = !isExpanded }) {
 
+        val currencyLabel = state.selectedCurrency?.let { "${it.code}  (${it.name})" } ?: ""
+
         TextField(modifier = Modifier.menuAnchor(),
             onValueChange = { },
-            value = state.selectedCurrencyCode,
+            value = currencyLabel,
             readOnly = true,
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
             })
         ExposedDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
             state.currencies.forEachIndexed { index, item ->
-                DropdownMenuItem(
-                    text = {
-                        Text(text = item.name)
-                    },
-                    onClick = {
-                        isExpanded = false
-                        onItemSelected(state.currencies[index])
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                DropdownMenuItem(text = {
+                    Text(text = item.name)
+                }, onClick = {
+                    isExpanded = false
+                    onItemSelected(state.currencies[index])
+                }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                 )
             }
 
@@ -63,13 +60,13 @@ fun CurrencySelector(
 @Preview(showBackground = true)
 @Composable
 private fun CurrencySelectorPreview() {
-    CurrencySelector(
-        state = CurrencyUIState(
-            currencies = listOf(
-                CurrencyModel(
-                    code = "USD", name = "United States Dollar"
-                )
+    CurrencySelector(state = CurrencyUIState(
+        currencies = listOf(
+            CurrencyModel(
+                code = "USD", name = "United States Dollar"
             )
-        , selectedCurrencyCode = "USD"), onItemSelected = {}
-    )
+        ), selectedCurrency = CurrencyModel(
+            code = "USD", name = "United States Dollar"
+        )
+    ), onItemSelected = {})
 }

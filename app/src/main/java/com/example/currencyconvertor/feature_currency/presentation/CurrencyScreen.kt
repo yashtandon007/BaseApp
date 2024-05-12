@@ -24,20 +24,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.currencyconvertor.R
+import com.example.currencyconvertor.feature_currency.data.worker.SyncWorker
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyRateModel
 import com.example.currencyconvertor.feature_currency.presentation.components.CurrencyConvertorItem
 import com.example.currencyconvertor.feature_currency.presentation.components.CurrencySelector
+import com.example.currencyconvertor.feature_currency.util.printLogD
 
 @Composable
 fun CurrencyScreen(
     state: CurrencyUIState, onEvent: (CurrencyEvent) -> Unit
 ) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -66,9 +70,14 @@ fun CurrencyScreen(
             }
 
         } else {
-            Column(
+             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
+                Button(onClick = {
+                    SyncWorker.startUpSyncWork( context)
+                }) {
+                    Text(text = "Loadasdasd")
+                }
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -111,11 +120,15 @@ fun CurrencyScreen(
     }
 }
 
+/**
+ * Checks if the amount is valid double, accepts empty.
+ */
 private fun isValidAmount(amount: String): Boolean {
-    val dotCount = amount.toCharArray().count { char ->
-        char == '.'
+    if (amount.isEmpty()) {
+        return true
     }
-    return !(dotCount > 1 || amount.contains(",") || amount.firstOrNull() == '.')
+    val regex = Regex("[0-9]{1,13}(\\.[0-9]*)?")
+    return regex.matches(amount)
 }
 
 @Composable
@@ -142,6 +155,8 @@ fun CurrencyScreenPreview() {
                 CurrencyRateModel(
                     rate = 2.1, code = "AUD"
                 ),
+            ), selectedCurrency = CurrencyModel(
+                code = "USD", name = "Dollar"
             ),
             isLoading = false,
         )

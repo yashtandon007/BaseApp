@@ -5,13 +5,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.currencyconvertor.feature_currency.data.util.DataState
+import com.example.currencyconvertor.feature_currency.data.worker.SyncWorker
+import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
 import com.example.currencyconvertor.feature_currency.domain.repository.CurrencyRepository
 import com.example.currencyconvertor.feature_currency.util.printLogD
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,7 +30,7 @@ class CurrencyViewModel @Inject constructor(
     private var job: Job? = null
 
     init {
-        onEvent(CurrencyEvent.GetCurrencies)
+       onEvent(CurrencyEvent.GetCurrencies)
     }
 
     fun onEvent(event: CurrencyEvent) {
@@ -49,7 +52,7 @@ class CurrencyViewModel @Inject constructor(
                 is CurrencyEvent.SelectCurrencyCode -> {
                     event.currencyModel?.let {
                         state = state.copy(
-                            selectedCurrencyCode = it.code
+                            selectedCurrency = CurrencyModel(code = it.code, name = it.name)
                         )
                     }
                     getCurrencyRates()
@@ -73,7 +76,7 @@ class CurrencyViewModel @Inject constructor(
                     state = state.copy(
                         currencies = result.data, isLoading = false
                     )
-                    if (state.selectedCurrencyCode.isBlank()) {
+                    if (state.selectedCurrency == null) {
                         onEvent(CurrencyEvent.SelectCurrencyCode(state.currencies.getOrNull(0)))
                     }
                 }
@@ -89,20 +92,20 @@ class CurrencyViewModel @Inject constructor(
 
     private suspend fun getCurrencyRates() {
         val amount = state.amount.toDoubleOrNull() ?: 0.0
-        val currencyCode = state.selectedCurrencyCode
+        val currencyCode = state.selectedCurrency?.code ?:""
 
         if (currencyCode.isNotBlank()) {
             currencyRepository.getCurrencyRates(amount, currencyCode).collect { result ->
                 printLogD("viewModel", " currency rates result, : $result")
-                when (result) {
+                state = when (result) {
                     is DataState.Error -> {
-                        state = state.copy(
+                        state.copy(
                             error = result.message
                         )
                     }
 
                     is DataState.Success -> {
-                        state = state.copy(
+                        state.copy(
                             convertedRates = result.data
                         )
                     }
@@ -111,9 +114,6 @@ class CurrencyViewModel @Inject constructor(
         }
     }
 
-    sealed interface UiEvent {
-        data class ShowSnackbar(val message: String) : UiEvent
-    }
 }
 
 

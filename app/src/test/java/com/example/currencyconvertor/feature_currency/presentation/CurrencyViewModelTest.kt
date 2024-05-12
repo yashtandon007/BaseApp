@@ -48,7 +48,7 @@ class CurrencyViewModelTest {
                 )
             )
         )
-        val selectedCurrencyCode = currencyViewModel.state.selectedCurrencyCode
+        val selectedCurrencyCode = currencyViewModel.state.selectedCurrency?.code
 
         assertEquals("INR", selectedCurrencyCode)
     }

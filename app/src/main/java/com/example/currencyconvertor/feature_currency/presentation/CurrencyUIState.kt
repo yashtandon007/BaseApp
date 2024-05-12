@@ -9,5 +9,5 @@ data class CurrencyUIState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val amount: String = "",
-    val selectedCurrencyCode: String = "",
+    val selectedCurrency: CurrencyModel? = null
 )

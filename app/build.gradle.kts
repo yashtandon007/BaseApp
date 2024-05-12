@@ -69,13 +69,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-
+    implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     implementation(libs.okhttp)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
-    implementation(libs.androidx.hilt.common)
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.hilt.android)
@@ -85,5 +84,5 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.work.runtime.ktx)
-
+    ksp(libs.androidx.hilt.compiler)
 }

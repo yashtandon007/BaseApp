@@ -3,6 +3,7 @@ package com.example.currencyconvertor.feature_currency.data.repository
 import com.example.currencyconvertor.feature_currency.data.data_source.cache.FakeCurrencyCacheDataSourceImpl
 import com.example.currencyconvertor.feature_currency.data.data_source.network.FakeCurrencyNetworkDataSourceImpl
 import com.example.currencyconvertor.feature_currency.data.util.DataState
+import com.example.currencyconvertor.feature_currency.data.util.GenericErrors.NETWORK_ERROR_NO_NETWORK
 import com.example.currencyconvertor.feature_currency.data.util.GenericErrors.NETWORK_ERROR_UNKNOWN
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyRateModel
@@ -58,7 +59,7 @@ class CurrencyRepositoryTest {
         val result = currencyRepositoryImpl.getCurrencies().first()
 
         assertTrue(result is DataState.Error)
-        assertEquals((result as DataState.Error).message, NETWORK_ERROR_UNKNOWN)
+        assertEquals((result as DataState.Error).message, NETWORK_ERROR_NO_NETWORK)
         assertTrue(currencyCacheDataSource.getCurrencies().isEmpty())
     }
 
@@ -94,7 +95,7 @@ class CurrencyRepositoryTest {
         ).first()
 
         assertTrue(result is DataState.Error)
-        assertEquals(NETWORK_ERROR_UNKNOWN,(result as DataState.Error).message)
+        assertEquals(NETWORK_ERROR_NO_NETWORK,(result as DataState.Error).message)
         assertTrue(currencyCacheDataSource.getCurrencies().isEmpty())
 
     }

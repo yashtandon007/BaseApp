@@ -1,28 +1,20 @@
 package com.example.currencyconvertor
 
 import android.app.Application
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import com.example.currencyconvertor.feature_currency.data.worker.SyncWorker
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
-import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @HiltAndroidApp
-class CurrencyApp : Application() {
+class CurrencyApp : Application(), Configuration.Provider {
 
-    override fun onCreate() {
-        super.onCreate()
-        enqueueSyncDb()
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
-    }
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
-    private fun enqueueSyncDb() {
-        val syncDbWorkRequest =
-            PeriodicWorkRequestBuilder<SyncWorker>(30, TimeUnit.MINUTES).setConstraints(
-                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-            ).build()
-        WorkManager.getInstance(applicationContext).enqueue(syncDbWorkRequest)
-    }
 }
