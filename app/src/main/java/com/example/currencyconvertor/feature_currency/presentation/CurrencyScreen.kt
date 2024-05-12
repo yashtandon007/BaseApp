@@ -32,7 +32,7 @@ import com.example.currencyconvertor.feature_currency.presentation.components.Cu
 import com.example.currencyconvertor.feature_currency.presentation.components.CurrencySelector
 
 @Composable
-fun NotesScreen(
+fun CurrencyScreen(
     state: CurrencyUIState, onEvent: (CurrencyEvent) -> Unit
 ) {
     Box(
@@ -78,8 +78,8 @@ fun NotesScreen(
 
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
-
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     items(state.convertedRates) { currencyRateModel ->
                         CurrencyConvertorItem(
@@ -101,8 +101,8 @@ private fun isValidAmount(amount: String): Boolean {
 
 @Composable
 @Preview(showBackground = true)
-fun NotesScreenPreview() {
-    NotesScreen(
+fun CurrencyScreenPreview() {
+    CurrencyScreen(
         state = CurrencyUIState(
             currencies = listOf(
                 CurrencyModel(

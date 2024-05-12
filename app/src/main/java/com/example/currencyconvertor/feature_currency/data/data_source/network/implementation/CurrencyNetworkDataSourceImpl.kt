@@ -8,6 +8,9 @@ import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyRateModel
 import javax.inject.Inject
 
+/**
+ * A network data source that provides currency data.
+ */
 class CurrencyNetworkDataSourceImpl @Inject constructor(
     private val apiService: ApiService
 ) : CurrencyNetworkDataSource {

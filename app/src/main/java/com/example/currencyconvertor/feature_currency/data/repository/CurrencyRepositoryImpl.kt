@@ -12,13 +12,24 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
+/**
+ * Implementation of the CurrencyRepository interface.
+ *
+ * @param currencyCacheDataSource The data source for cached currencies.
+ * @param currencyNetworkDataSource The data source for network currencies.
+ */
 class CurrencyRepositoryImpl @Inject constructor(
     private val currencyCacheDataSource: CurrencyCacheDataSource,
     private val currencyNetworkDataSource: CurrencyNetworkDataSource
 ) : CurrencyRepository {
 
-    private val thresholdMinutes = 30
-
+    /**
+     *
+     * Retrieves a list of currencies.
+     *
+     * @return A flow that emits the list of currencies.
+     *
+     */
     override fun getCurrencies() = flow {
         printLogD("repo", " getCurrencies...")
         if (currencyCacheDataSource.getCurrencies().isEmpty()) {
@@ -46,6 +57,13 @@ class CurrencyRepositoryImpl @Inject constructor(
         emit(DataState.Error(it.message.toString()))
     }
 
+    /**
+     * Retrieves currency rates for a given amount and currency code.
+     * @param amount The amount to convert.
+     * @param currencyCode The currency code to convert to.
+     *
+     * @return A flow that emits the converted currency rates.
+     */
     override fun getCurrencyRates(
         amount: Double, currencyCode: String
     ) = flow {
@@ -81,6 +99,14 @@ class CurrencyRepositoryImpl @Inject constructor(
         emit(DataState.Error(it.message.toString()))
     }
 
+    /**
+     * Retrieves a list of converted currency rates for a given amount and currency code.
+     *
+     * @param amount The amount to convert.
+     * @param currencyCode The currency code to convert to.
+     *
+     * @return A list of converted currency rates.
+     */
     private fun getConvertedRates(
         amount: Double, currencyCode: String, currencyRates: List<CurrencyRateModel>
     ): List<CurrencyRateModel> {

@@ -1,5 +1,8 @@
 package com.example.currencyconvertor.feature_currency.presentation.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -20,9 +23,10 @@ import com.example.currencyconvertor.feature_currency.domain.model.CurrencyRateM
 fun CurrencyConvertorItem(
     currencyRateModel: CurrencyRateModel, modifier: Modifier = Modifier
 ) {
-
     Box(
-        modifier.clip(shape = RoundedCornerShape(12.dp))
+        modifier
+            .background(MaterialTheme.colorScheme.secondary)
+            .clip(shape = RoundedCornerShape(12.dp))
     ) {
 
         Column(
@@ -32,14 +36,14 @@ fun CurrencyConvertorItem(
 
             Text(
                 text = currencyRateModel.rate.toString(),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = currencyRateModel.code,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -49,7 +53,16 @@ fun CurrencyConvertorItem(
     }
 }
 
-@Preview( showBackground = true)
+@Preview(
+    name = "Dark Mode",
+    showBackground = true,
+    uiMode = UI_MODE_NIGHT_YES
+)
+@Preview(
+    name = "Light Mode",
+    showBackground = true,
+    uiMode = UI_MODE_NIGHT_NO
+)
 @Composable
 private fun CurrencyConvertorItemPreview() {
     CurrencyConvertorItem(

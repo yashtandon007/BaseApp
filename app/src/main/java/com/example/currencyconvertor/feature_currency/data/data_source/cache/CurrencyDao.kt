@@ -8,6 +8,9 @@ import androidx.room.Query
 import com.example.currencyconvertor.feature_currency.data.data_source.cache.entity.CurrencyCacheEntity
 import com.example.currencyconvertor.feature_currency.data.data_source.cache.entity.CurrencyRateEntity
 
+/**
+ * Data Access Object for interacting with the currency database.
+ */
 @Dao
 interface CurrencyDao {
 

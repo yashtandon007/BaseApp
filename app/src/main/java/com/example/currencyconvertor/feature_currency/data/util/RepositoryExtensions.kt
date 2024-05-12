@@ -9,6 +9,13 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 import retrofit2.HttpException
 
+/**
+ *
+ * A safe API call wrapper that handles exceptions and returns a [NetworkResult].
+ *
+ * @param apiCall The suspend function
+ *
+ */
 suspend fun <T> safeApiCall(
     apiCall: suspend () -> T
 ): NetworkResult<T> {

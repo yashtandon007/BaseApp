@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CC</string>
-    <string name="title_activity_main">CC</string>
+    <string name="app_name">Currency Convertor</string>
+    <string name="title_activity_main">Currency Convertor</string>
     <string name="amount">Amount</string>
 </resources>

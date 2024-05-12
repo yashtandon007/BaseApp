@@ -10,7 +10,10 @@ import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyRateModel
 import javax.inject.Inject
 
-
+/**
+ *  An implementation of the [CurrencyCacheDataSource] interface that uses a Room database to cache currencies and currency rates.
+ *
+ */
 class CurrencyCacheDataSourceImpl @Inject constructor(
     private val currencyDao: CurrencyDao
 ) : CurrencyCacheDataSource {

@@ -10,16 +10,19 @@ import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 
 @HiltAndroidApp
-class NoteApp : Application() {
+class CurrencyApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        enqueueSyncDb()
 
-        val sendLogsWorkRequest =
+    }
+
+    private fun enqueueSyncDb() {
+        val syncDbWorkRequest =
             PeriodicWorkRequestBuilder<SyncWorker>(30, TimeUnit.MINUTES).setConstraints(
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             ).build()
-        WorkManager.getInstance(applicationContext).enqueue(sendLogsWorkRequest)
-
+        WorkManager.getInstance(applicationContext).enqueue(syncDbWorkRequest)
     }
 }

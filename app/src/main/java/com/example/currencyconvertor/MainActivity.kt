@@ -11,8 +11,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.currencyconvertor.feature_currency.presentation.CurrencyEvent
+import com.example.currencyconvertor.feature_currency.presentation.CurrencyScreen
 import com.example.currencyconvertor.feature_currency.presentation.CurrencyViewModel
-import com.example.currencyconvertor.feature_currency.presentation.NotesScreen
 import com.example.currencyconvertor.feature_currency.presentation.util.Screen
 import com.example.currencyconvertor.feature_currency.util.printLogD
 import com.example.currencyconvertor.ui.theme.MyApplicationTheme
@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable(Screen.CurrencyScreen.route) {
                             val vm = hiltViewModel<CurrencyViewModel>()
-                            NotesScreen(vm.state) { event ->
+                            CurrencyScreen(vm.state) { event ->
                                 printLogD("mainActivity", " onEvent, : $event")
                                 vm.onEvent(event)
                             }

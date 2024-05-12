@@ -1,5 +1,8 @@
 package com.example.currencyconvertor.feature_currency.data.util
 
+/**
+ * A collection of generic error constants.
+ */
 object GenericErrors {
 
     const val ERROR_UNKNOWN = "Unknown error"

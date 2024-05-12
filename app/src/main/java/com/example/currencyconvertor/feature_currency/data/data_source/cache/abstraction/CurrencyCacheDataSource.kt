@@ -3,7 +3,9 @@ package com.example.currencyconvertor.feature_currency.data.data_source.cache.ab
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyRateModel
 
-
+/**
+ * An interface for a data source that stores currency data.
+ */
 interface CurrencyCacheDataSource {
     suspend fun getCurrencies(): List<CurrencyModel>
 
