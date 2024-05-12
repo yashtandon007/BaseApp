@@ -21,7 +21,7 @@ class SyncWorker @AssistedInject constructor(
         return try {
             val data = networkDataSource.getCurrencyRates()
             val networkTimeStamp = data.firstOrNull()?.timeStamp
-            val cacheTimeStamp = cacheDataSource.getCurrenciesRates().firstOrNull()?.timeStamp
+            val cacheTimeStamp = cacheDataSource.getCurrencyRates().firstOrNull()?.timeStamp
 
             if (cacheTimeStamp != networkTimeStamp) {
                 cacheDataSource.deleteCurrencyRates()

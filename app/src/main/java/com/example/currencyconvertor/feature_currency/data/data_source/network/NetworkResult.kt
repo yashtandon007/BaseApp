@@ -15,11 +15,9 @@ sealed class NetworkResult<out T> {
 
     /**
      * Represents an error response from the server.
-     * @param code The HTTP status code.
      * @param errorMessage The error message returned by the server.
      */
     data class Error(
-        val code: Int? = null,
         val errorMessage: String
     ): NetworkResult<Nothing>()
 

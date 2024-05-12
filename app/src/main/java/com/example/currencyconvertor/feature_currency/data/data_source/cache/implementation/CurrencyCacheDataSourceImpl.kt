@@ -27,7 +27,7 @@ class CurrencyCacheDataSourceImpl @Inject constructor(
     override suspend fun insertCurrencyRates(currencyRates: List<CurrencyRateModel>) =
         currencyDao.insertCurrencyRates(currencyRates.toCurrencyRateEntity())
 
-    override suspend fun getCurrenciesRates(): List<CurrencyRateModel> =
+    override suspend fun getCurrencyRates(): List<CurrencyRateModel> =
         currencyDao.getCurrenciesRates().toCurrencyRateModel()
 
     override suspend fun deleteCurrencyRates() {

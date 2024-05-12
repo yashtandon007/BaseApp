@@ -13,7 +13,7 @@ interface CurrencyCacheDataSource {
 
     suspend fun insertCurrencyRates(currencyRates: List<CurrencyRateModel>)
 
-    suspend fun getCurrenciesRates(): List<CurrencyRateModel>
+    suspend fun getCurrencyRates(): List<CurrencyRateModel>
 
     suspend fun deleteCurrencyRates()
 }

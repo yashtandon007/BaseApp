@@ -30,7 +30,7 @@ class FakeCurrencyCacheDataSourceImpl  : CurrencyCacheDataSource {
         currencyRatesData.addAll(currencyRates)
     }
 
-    override suspend fun getCurrenciesRates(): List<CurrencyRateModel> {
+    override suspend fun getCurrencyRates(): List<CurrencyRateModel> {
         if(isError){
             throw Exception(NETWORK_ERROR_UNKNOWN)
         }

@@ -4,6 +4,7 @@ import com.example.currencyconvertor.feature_currency.data.data_source.cache.abs
 import com.example.currencyconvertor.feature_currency.data.data_source.network.NetworkResult
 import com.example.currencyconvertor.feature_currency.data.data_source.network.abstraction.CurrencyNetworkDataSource
 import com.example.currencyconvertor.feature_currency.data.util.DataState
+import com.example.currencyconvertor.feature_currency.data.util.GenericErrors.ERROR_UNKNOWN
 import com.example.currencyconvertor.feature_currency.data.util.safeApiCall
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyRateModel
 import com.example.currencyconvertor.feature_currency.domain.repository.CurrencyRepository
@@ -31,30 +32,32 @@ class CurrencyRepositoryImpl @Inject constructor(
      *
      */
     override fun getCurrencies() = flow {
-        printLogD("repo", " getCurrencies...")
-        if (currencyCacheDataSource.getCurrencies().isEmpty()) {
-            val networkResult = safeApiCall {
-                currencyNetworkDataSource.getCurrencies()
-            }
-            when (networkResult) {
-                is NetworkResult.Success -> {
-                    currencyCacheDataSource.insetCurrencies(networkResult.data.sortedBy { it.name })
-                    emit(DataState.Success(currencyCacheDataSource.getCurrencies()))
-                }
+        printLogD("repository", "loading currencies...")
 
-                is NetworkResult.Error -> {
-                    printLogD("repository", "n/w error $networkResult")
-                    emit(DataState.Error(networkResult.errorMessage))
-                }
+        val cachedCurrencies = currencyCacheDataSource.getCurrencies()
+
+        if (cachedCurrencies.isNotEmpty()) {
+            emit(DataState.Success(cachedCurrencies))
+            return@flow
+        }
+
+        val networkResult = safeApiCall {
+            currencyNetworkDataSource.getCurrencies()
+        }
+        when (networkResult) {
+            is NetworkResult.Success -> {
+                currencyCacheDataSource.insetCurrencies(networkResult.data.sortedBy { it.name })
+                emit(DataState.Success(currencyCacheDataSource.getCurrencies()))
             }
-        } else {
-            val currencies = currencyCacheDataSource.getCurrencies()
-            printLogD("repository", "currencies success , data size:  ${currencies.size}")
-            emit(DataState.Success(currencies))
+
+            is NetworkResult.Error -> {
+                printLogD("repository", "Network error: ${networkResult.errorMessage}")
+                emit(DataState.Error(networkResult.errorMessage))
+            }
         }
     }.catch {
-        printLogD("repository", " error, msg: ${it.message}")
-        emit(DataState.Error(it.message.toString()))
+        printLogD("repository", "Error: ${it.message}")
+        emit(DataState.Error(it.message ?: ERROR_UNKNOWN))
     }
 
     /**
@@ -68,35 +71,35 @@ class CurrencyRepositoryImpl @Inject constructor(
         amount: Double, currencyCode: String
     ) = flow {
 
-        printLogD("repo", " getCurrencyRates...")
+        printLogD("repository", "loading currency rates...")
+        val cachedRates = currencyCacheDataSource.getCurrencyRates()
 
-        if (currencyCacheDataSource.getCurrenciesRates().isEmpty()) {
-
-            val networkResult = safeApiCall {
-                currencyNetworkDataSource.getCurrencyRates()
-            }
-            when (networkResult) {
-                is NetworkResult.Success -> {
-                    currencyCacheDataSource.insertCurrencyRates(networkResult.data)
-                    val convertedRates = getConvertedRates(
-                        amount, currencyCode, currencyCacheDataSource.getCurrenciesRates()
-                    )
-                    emit(DataState.Success(convertedRates))
-                }
-
-                is NetworkResult.Error -> {
-                    emit(DataState.Error(networkResult.errorMessage))
-                }
-            }
-        } else {
-            val convertedRates = getConvertedRates(
-                amount, currencyCode, currencyCacheDataSource.getCurrenciesRates()
-            )
+        if (cachedRates.isNotEmpty()) {
+            val convertedRates = convertCurrencyRates(amount, currencyCode, cachedRates)
             emit(DataState.Success(convertedRates))
+            return@flow
+        }
+
+        val networkResult = safeApiCall {
+            currencyNetworkDataSource.getCurrencyRates()
+        }
+        when (networkResult) {
+            is NetworkResult.Success -> {
+                currencyCacheDataSource.insertCurrencyRates(networkResult.data)
+                val convertedRates = convertCurrencyRates(
+                    amount, currencyCode, currencyCacheDataSource.getCurrencyRates()
+                )
+                emit(DataState.Success(convertedRates))
+            }
+
+            is NetworkResult.Error -> {
+                emit(DataState.Error(networkResult.errorMessage))
+            }
         }
 
     }.catch {
-        emit(DataState.Error(it.message.toString()))
+        printLogD("repository", "Error: ${it.message}")
+        emit(DataState.Error(it.message ?: ERROR_UNKNOWN))
     }
 
     /**
@@ -107,17 +110,17 @@ class CurrencyRepositoryImpl @Inject constructor(
      *
      * @return A list of converted currency rates.
      */
-    private fun getConvertedRates(
+    private fun convertCurrencyRates(
         amount: Double, currencyCode: String, currencyRates: List<CurrencyRateModel>
     ): List<CurrencyRateModel> {
 
-        val conversionRate = 1.0.div(currencyRates.first {
-            it.code == currencyCode
-        }.rate)
-        return currencyRates.map {
-            CurrencyRateModel(
-                rate = it.rate.times(conversionRate).times(amount), code = it.code
-            )
+        // Find the conversion rate for the given currency code
+        val conversionRate = currencyRates.find { it.code == currencyCode }?.rate ?: 1.0
+
+        // Apply conversion rate to each currency rate and multiply by amount
+        return currencyRates.map { currencyRate ->
+            val convertedRate = currencyRate.rate * (1 / conversionRate) * amount
+            CurrencyRateModel(rate = convertedRate, code = currencyRate.code)
         }
     }
 }

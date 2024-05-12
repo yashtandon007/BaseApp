@@ -14,13 +14,16 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +49,22 @@ fun CurrencyScreen(
                     .size(70.dp)
                     .align(Center)
             )
+        } else if (!state.error.isNullOrBlank()) {
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = state.error, color = MaterialTheme.colorScheme.onSurface)
+                Spacer(modifier = Modifier.height(6.dp))
+                Button(onClick = {
+                    onEvent(CurrencyEvent.GetCurrencies)
+                }) {
+                    Text(stringResource(R.string.reload))
+                }
+            }
+
         } else {
             Column(
                 modifier = Modifier.fillMaxSize()
@@ -104,6 +123,7 @@ private fun isValidAmount(amount: String): Boolean {
 fun CurrencyScreenPreview() {
     CurrencyScreen(
         state = CurrencyUIState(
+            error = "asassa",
             currencies = listOf(
                 CurrencyModel(
                     code = "Code", name = "USD"

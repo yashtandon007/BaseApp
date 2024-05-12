@@ -4,13 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.currencyconvertor.feature_currency.presentation.CurrencyEvent
 import com.example.currencyconvertor.feature_currency.presentation.CurrencyScreen
 import com.example.currencyconvertor.feature_currency.presentation.CurrencyViewModel
 import com.example.currencyconvertor.feature_currency.presentation.util.Screen

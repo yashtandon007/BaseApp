@@ -7,6 +7,7 @@ data class CurrencyUIState(
     val currencies: List<CurrencyModel> = listOf(),
     val convertedRates: List<CurrencyRateModel> = listOf(),
     val isLoading: Boolean = true,
+    val error: String? = null,
     val amount: String = "",
     val selectedCurrencyCode: String = "",
 )
