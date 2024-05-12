@@ -2,18 +2,18 @@ package com.example.currencyconvertor.feature_currency.data.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.example.currencyconvertor.feature_currency.data.data_source.cache.CurrencyDao
 import com.example.currencyconvertor.feature_currency.data.data_source.cache.abstraction.CurrencyCacheDataSource
 import com.example.currencyconvertor.feature_currency.data.data_source.network.abstraction.CurrencyNetworkDataSource
 import com.example.currencyconvertor.feature_currency.util.printLogD
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import dagger.multibindings.IntKey
-import javax.inject.Inject
+import java.util.concurrent.TimeUnit
 
 @HiltWorker
 class SyncWorker @AssistedInject constructor(
@@ -25,41 +25,32 @@ class SyncWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            printLogD("worker", "syncing data...")
-
             val data = networkDataSource.getCurrencyRates()
-            printLogD("worker", "Data:before dele ${cacheDataSource.getCurrencies().size}...")
+            val networkTimeStamp = data.firstOrNull()?.timeStamp?:0
+            val cacheTimeStamp = cacheDataSource.getCurrencyRates().firstOrNull()?.timeStamp?:0
 
-            val networkTimeStamp = data.firstOrNull()?.timeStamp
-            val cacheTimeStamp = cacheDataSource.getCurrencyRates().firstOrNull()?.timeStamp
-            printLogD("worker", "networkTimeStamp: ${networkTimeStamp}.  and cacheTimeStamp: ${cacheTimeStamp}..")
-
-            if (cacheTimeStamp != networkTimeStamp) {
+            // New data is available at server
+            if (networkTimeStamp - cacheTimeStamp >= 0 ) {
                 cacheDataSource.deleteCurrencyRates()
-                printLogD("worker", "Data:after dele ${cacheDataSource.getCurrencies().size}...")
                 cacheDataSource.insertCurrencyRates(data)
-                printLogD("worker", "Data:after inser ${cacheDataSource.getCurrencies().size}...")
             }
             Result.success()
         } catch (e: Exception) {
-            printLogD("worker", "syncing data failed : Cause ${e.message}...")
+            printLogD("worker", "syncing data failed : Cause ${e.message}")
             Result.failure()
         }
     }
 
 
     companion object {
-        /**
-         * Expedited one time work to sync data on app startup
-         */
+
         fun startUpSyncWork(context: Context) {
-//            val constraints = Constraints.Builder()
-//                .setRequiresCharging(true)
-//                .build()
-            val work = OneTimeWorkRequestBuilder<SyncWorker>()
-                .build()
-            val workManager = WorkManager.getInstance(context)
-            workManager.enqueue(work)
+            val constraints =
+                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+            val work = PeriodicWorkRequestBuilder<SyncWorker>(30, TimeUnit.MINUTES).setConstraints(
+                constraints
+            ).build()
+            WorkManager.getInstance(context).enqueue(work)
             printLogD("worker", "sync db request enqueed...")
         }
     }

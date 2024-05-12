@@ -23,19 +23,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.currencyconvertor.R
-import com.example.currencyconvertor.feature_currency.data.worker.SyncWorker
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyRateModel
 import com.example.currencyconvertor.feature_currency.presentation.components.CurrencyConvertorItem
 import com.example.currencyconvertor.feature_currency.presentation.components.CurrencySelector
-import com.example.currencyconvertor.feature_currency.util.printLogD
 
 @Composable
 fun CurrencyScreen(
@@ -73,11 +70,6 @@ fun CurrencyScreen(
              Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                Button(onClick = {
-                    SyncWorker.startUpSyncWork( context)
-                }) {
-                    Text(text = "Loadasdasd")
-                }
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth()
