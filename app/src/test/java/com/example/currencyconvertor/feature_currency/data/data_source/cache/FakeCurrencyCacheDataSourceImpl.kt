@@ -37,6 +37,13 @@ class FakeCurrencyCacheDataSourceImpl  : CurrencyCacheDataSource {
         return currencyRatesData
     }
 
+    override suspend fun deleteCurrencyRates() {
+        if(isError){
+            throw Exception(NETWORK_ERROR_UNKNOWN)
+        }
+        currencyRatesData.clear()
+    }
+
     fun setError(){
         isError = true
     }

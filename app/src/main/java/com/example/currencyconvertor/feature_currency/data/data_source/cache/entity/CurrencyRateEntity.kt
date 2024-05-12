@@ -16,7 +16,9 @@ data class CurrencyRateEntity(
     val code: String,
 
     @ColumnInfo(name = "currency_value")
-    val rate: Double
+    val rate: Double,
+
+    val timeStamp: Long = 0
 
 ) : Parcelable {
     companion object {

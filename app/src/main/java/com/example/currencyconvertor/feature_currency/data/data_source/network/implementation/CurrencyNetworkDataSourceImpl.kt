@@ -22,7 +22,7 @@ class CurrencyNetworkDataSourceImpl @Inject constructor(
 
     override suspend fun getCurrencyRates(): List<CurrencyRateModel> {
 
-        return apiService.getCurrencyRates().body()?.toCacheEntity()?.toCurrencyRateModel()
+        return apiService.getCurrencyRates().body()?.toCurrencyRateModel()
             .orEmpty()
     }
 

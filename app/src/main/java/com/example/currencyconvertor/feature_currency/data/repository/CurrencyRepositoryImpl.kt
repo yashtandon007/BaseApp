@@ -17,6 +17,8 @@ class CurrencyRepositoryImpl @Inject constructor(
     private val currencyNetworkDataSource: CurrencyNetworkDataSource
 ) : CurrencyRepository {
 
+    private val thresholdMinutes = 30
+
     override fun getCurrencies() = flow {
         printLogD("repo", " getCurrencies...")
         if (currencyCacheDataSource.getCurrencies().isEmpty()) {
@@ -29,7 +31,7 @@ class CurrencyRepositoryImpl @Inject constructor(
                     emit(DataState.Success(currencyCacheDataSource.getCurrencies()))
                 }
 
-                is NetworkResult.GenericError -> {
+                is NetworkResult.Error -> {
                     printLogD("repository", "n/w error $networkResult")
                     emit(DataState.Error(networkResult.errorMessage))
                 }
@@ -49,6 +51,7 @@ class CurrencyRepositoryImpl @Inject constructor(
     ) = flow {
 
         printLogD("repo", " getCurrencyRates...")
+
         if (currencyCacheDataSource.getCurrenciesRates().isEmpty()) {
 
             val networkResult = safeApiCall {
@@ -63,7 +66,7 @@ class CurrencyRepositoryImpl @Inject constructor(
                     emit(DataState.Success(convertedRates))
                 }
 
-                is NetworkResult.GenericError -> {
+                is NetworkResult.Error -> {
                     emit(DataState.Error(networkResult.errorMessage))
                 }
             }
@@ -87,10 +90,8 @@ class CurrencyRepositoryImpl @Inject constructor(
         }.rate)
         return currencyRates.map {
             CurrencyRateModel(
-                rate = it.rate.times(conversionRate).times(amount),
-                code = it.code
+                rate = it.rate.times(conversionRate).times(amount), code = it.code
             )
         }
     }
-
 }

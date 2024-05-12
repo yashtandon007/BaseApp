@@ -16,7 +16,6 @@ data class CurrencyCacheEntity(
     @ColumnInfo(name = "currency_name")
     val name: String,
 
-    val timeStamp: Long = 0
 ){
     companion object {
         const val TABLE_NAME = "currency"

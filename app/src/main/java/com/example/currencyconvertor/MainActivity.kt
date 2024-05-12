@@ -35,9 +35,6 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable(Screen.CurrencyScreen.route) {
                             val vm = hiltViewModel<CurrencyViewModel>()
-                            LaunchedEffect(Unit) {
-                                vm.onEvent(CurrencyEvent.GetCurrencies)
-                            }
                             NotesScreen(vm.state) { event ->
                                 printLogD("mainActivity", " onEvent, : $event")
                                 vm.onEvent(event)

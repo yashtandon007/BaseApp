@@ -18,7 +18,7 @@ fun List<CurrencyCacheEntity>.toCurrencyModel(): List<CurrencyModel> {
 fun List<CurrencyModel>.toCurrencyCacheEntity(): List<CurrencyCacheEntity> {
     return map {
         CurrencyCacheEntity(
-           name = it.name, code = it.code
+            name = it.name, code = it.code
         )
     }
 }
@@ -31,10 +31,10 @@ fun List<CurrencyNetworkEntity>.toCacheEntity(): List<CurrencyCacheEntity> {
     }
 }
 
-fun CurrencyRatesNetworkEntity.toCacheEntity(): List<CurrencyRateEntity> {
+fun CurrencyRatesNetworkEntity.toCurrencyRateModel(): List<CurrencyRateModel> {
     return rates.map {
-        CurrencyRateEntity(
-            code = it.key, rate = it.value
+        CurrencyRateModel(
+            code = it.key, rate = it.value, timeStamp = timeStamp
         )
     }
 }

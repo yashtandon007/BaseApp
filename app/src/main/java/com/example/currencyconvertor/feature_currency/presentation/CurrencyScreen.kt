@@ -71,7 +71,7 @@ fun NotesScreen(
                 CurrencySelector(
                     modifier = Modifier, state = state
                 ) {
-                    onEvent(CurrencyEvent.OnItemSelected(it))
+                    onEvent(CurrencyEvent.SelectCurrencyCode(it))
                 }
 
                 Spacer(modifier = Modifier.height(6.dp))

@@ -10,8 +10,7 @@ import com.example.currencyconvertor.feature_currency.domain.repository.Currency
 import com.example.currencyconvertor.feature_currency.util.printLogD
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,37 +20,44 @@ class CurrencyViewModel @Inject constructor(
 
     var state by mutableStateOf(CurrencyUIState())
         private set
-    private var getCurrenciesJob: Job? = null
-    private var convertCurrencyJob: Job? = null
+    private var job: Job? = null
+
+    init {
+        onEvent(CurrencyEvent.GetCurrencies)
+    }
 
     fun onEvent(event: CurrencyEvent) {
-        printLogD("vm", " onEvent, : $event")
-        when (event) {
-            is CurrencyEvent.GetCurrencies -> {
-                getCurrencies()
-            }
-
-            is CurrencyEvent.AmountChanged -> {
-                state = state.copy(
-                    amount = event.amount
-                )
-                convertCurrency()
-            }
-
-            is CurrencyEvent.OnItemSelected -> {
-                event.currencyModel?.let {
-                    state = state.copy(
-                        selectedCurrencyCode = it.code
-                    )
+        job?.cancel()
+        job = viewModelScope.launch {
+            printLogD("vm", " onEvent, : $event")
+            when (event) {
+                is CurrencyEvent.GetCurrencies -> {
+                    getCurrencies()
+                    onEvent(CurrencyEvent.SelectCurrencyCode(state.currencies.getOrNull(0)))
                 }
-                convertCurrency()
+
+                is CurrencyEvent.AmountChanged -> {
+                    state = state.copy(
+                        amount = event.amount
+                    )
+                    getCurrencyRates()
+                }
+
+                is CurrencyEvent.SelectCurrencyCode -> {
+                    event.currencyModel?.let {
+                        state = state.copy(
+                            selectedCurrencyCode = it.code
+                        )
+                    }
+                    getCurrencyRates()
+                }
             }
         }
     }
 
-    private fun getCurrencies() {
-        getCurrenciesJob?.cancel()
-        getCurrenciesJob = currencyRepository.getCurrencies().onEach {
+    private suspend fun getCurrencies() {
+
+        currencyRepository.getCurrencies().collect {
             when (it) {
                 is DataState.Error -> {
 
@@ -61,32 +67,29 @@ class CurrencyViewModel @Inject constructor(
                     state = state.copy(
                         currencies = it.data, isLoading = false
                     )
-                    onEvent(CurrencyEvent.OnItemSelected(it.data.getOrNull(0)))
                 }
             }
-        }.launchIn(viewModelScope)
+        }
     }
 
-    private fun convertCurrency() {
-        convertCurrencyJob?.cancel()
+    private suspend fun getCurrencyRates() {
         val amount = state.amount.ifBlank { "0.0" }
         val currencyCode = state.selectedCurrencyCode
 
         if (currencyCode.isNotBlank()) {
-            convertCurrencyJob =
-                currencyRepository.getCurrencyRates(amount.toDouble(), currencyCode).onEach {
-                    when (it) {
-                        is DataState.Error -> {
+            currencyRepository.getCurrencyRates(amount.toDouble(), currencyCode).collect {
+                when (it) {
+                    is DataState.Error -> {
 
-                        }
-
-                        is DataState.Success -> {
-                            state = state.copy(
-                                convertedRates = it.data
-                            )
-                        }
                     }
-                }.launchIn(viewModelScope)
+
+                    is DataState.Success -> {
+                        state = state.copy(
+                            convertedRates = it.data
+                        )
+                    }
+                }
+            }
         }
     }
 

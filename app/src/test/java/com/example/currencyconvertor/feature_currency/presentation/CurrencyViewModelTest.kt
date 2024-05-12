@@ -29,7 +29,7 @@ class CurrencyViewModelTest {
     }
 
     @Test
-    fun gsdsd() = runTest {
+    fun getCurrencies_success() = runTest {
 
         currencyViewModel.onEvent(CurrencyEvent.GetCurrencies)
         val currencies = currencyViewModel.state.currencies
@@ -38,11 +38,11 @@ class CurrencyViewModelTest {
     }
 
     @Test
-    fun gsdsdasas() = runTest {
+    fun selectCurrencyCode_success() = runTest {
 
         currencyViewModel.onEvent(CurrencyEvent.GetCurrencies)
         currencyViewModel.onEvent(
-            CurrencyEvent.OnItemSelected(
+            CurrencyEvent.SelectCurrencyCode(
                 CurrencyModel(
                     code = "INR", name = "Rupee"
                 )
@@ -54,19 +54,7 @@ class CurrencyViewModelTest {
     }
 
     @Test
-    fun defaultValues() = runTest {
-
-        val state = currencyViewModel.state
-
-        assertEquals("", state.selectedCurrencyCode)
-        assertEquals("", state.amount)
-        assertEquals(true, state.isLoading)
-        assertEquals(0, state.currencies.size)
-        assertEquals(0, state.convertedRates.size)
-    }
-
-    @Test
-    fun gsdsdasasasas() = runTest {
+    fun amountChanged_success() = runTest {
 
         currencyViewModel.onEvent(CurrencyEvent.GetCurrencies)
         currencyViewModel.onEvent(CurrencyEvent.AmountChanged(amount = "10.0"))
@@ -76,12 +64,12 @@ class CurrencyViewModelTest {
     }
 
     @Test
-    fun gsdsdasasasasasdadas() = runTest {
+    fun currencyConvertedRates_success() = runTest {
 
         currencyViewModel.onEvent(CurrencyEvent.GetCurrencies)
         currencyViewModel.onEvent(CurrencyEvent.AmountChanged(amount = "10.0"))
         currencyViewModel.onEvent(
-            CurrencyEvent.OnItemSelected(
+            CurrencyEvent.SelectCurrencyCode(
                 CurrencyModel(
                     code = "INR", name = "Rupee"
                 )

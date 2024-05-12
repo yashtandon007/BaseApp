@@ -1,6 +1,7 @@
 package com.example.currencyconvertor.feature_currency.data.data_source.cache
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -8,7 +9,7 @@ import com.example.currencyconvertor.feature_currency.data.data_source.cache.ent
 import com.example.currencyconvertor.feature_currency.data.data_source.cache.entity.CurrencyRateEntity
 
 @Dao
-interface CurrencyDao{
+interface CurrencyDao {
 
     @Query("SELECT * FROM currency")
     suspend fun getCurrencies(): List<CurrencyCacheEntity>
@@ -23,6 +24,8 @@ interface CurrencyDao{
     @Query("SELECT * FROM currency_rate")
     suspend fun getCurrenciesRates(): List<CurrencyRateEntity>
 
+    @Query("DELETE FROM currency_rate")
+    suspend fun deleteCurrencyRates()
 }
 
 
