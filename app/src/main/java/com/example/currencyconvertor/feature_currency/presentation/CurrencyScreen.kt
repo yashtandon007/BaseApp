@@ -20,10 +20,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,13 +34,12 @@ import com.example.currencyconvertor.R
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyModel
 import com.example.currencyconvertor.feature_currency.domain.model.CurrencyRateModel
 import com.example.currencyconvertor.feature_currency.presentation.components.CurrencyConvertorItem
-import com.example.currencyconvertor.feature_currency.presentation.components.CurrencySelector
+import com.example.currencyconvertor.feature_currency.presentation.components.LargeDropdownMenu
 
 @Composable
 fun CurrencyScreen(
     state: CurrencyUIState, onEvent: (CurrencyEvent) -> Unit
 ) {
-    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -88,11 +89,18 @@ fun CurrencyScreen(
                     shape = RoundedCornerShape(6.dp)
                 )
                 Spacer(modifier = Modifier.height(6.dp))
-                CurrencySelector(
-                    modifier = Modifier, state = state
-                ) {
-                    onEvent(CurrencyEvent.SelectCurrencyCode(it))
-                }
+
+                 val selectedIndex by remember { mutableIntStateOf(0) }
+                 val currencyLabel = state.selectedCurrency?.let { "${it.code}  (${it.name})" } ?: ""
+
+                 LargeDropdownMenu(
+                     label = currencyLabel,
+                     items = state.currencies,
+                     selectedIndex = selectedIndex,
+                     onItemSelected = { _, item ->
+                         onEvent(CurrencyEvent.SelectCurrencyCode(item))
+                     },
+                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
