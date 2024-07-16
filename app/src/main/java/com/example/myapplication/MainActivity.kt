@@ -22,6 +22,7 @@ import com.example.myapplication.feature_note.presentation.util.Screen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+\//god in activity
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
