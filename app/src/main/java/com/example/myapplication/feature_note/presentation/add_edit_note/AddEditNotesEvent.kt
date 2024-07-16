@@ -9,3 +9,4 @@ sealed class AddEditNotesEvent{
     data class EnterContent(val content: String):AddEditNotesEvent()
     data class ChangeColor(val color: Int):AddEditNotesEvent()
 }
+//par1
