@@ -2,10 +2,11 @@ package com.example.myapplication.feature_note.presentation.add_edit_note
 
 import androidx.compose.ui.focus.FocusState
 
-
+//paper2
 sealed class AddEditNotesEvent{
     data object SaveNote:AddEditNotesEvent()
     data class EnterTitle(val title: String):AddEditNotesEvent()
     data class EnterContent(val content: String):AddEditNotesEvent()
     data class ChangeColor(val color: Int):AddEditNotesEvent()
 }
+//paper2
