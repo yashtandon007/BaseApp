@@ -9,4 +9,5 @@ data class AddEditNotesState(
     val color: Int,
     val currentNoteId: Int? = null
 )
+//paper2
 
