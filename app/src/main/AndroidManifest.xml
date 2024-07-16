@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 //new line from dev
+    //dev dev dev
     <uses-permission android:name="android.permission.INTERNET" />
 //code from dev
     <application
