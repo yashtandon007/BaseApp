@@ -3,6 +3,7 @@ package com.example.myapplication.feature_note.presentation.add_edit_note
 import androidx.compose.ui.focus.FocusState
 
 //nail1
+//nail3
 sealed class AddEditNotesEvent{
     data object SaveNote:AddEditNotesEvent()
     data class EnterTitle(val title: String):AddEditNotesEvent()
