@@ -4,3 +4,4 @@ data class NoteTextFieldState(
     val text: String = "", val hint: String = "", val isHintVisible: Boolean = true
 )
 //ac1
+//ac2
