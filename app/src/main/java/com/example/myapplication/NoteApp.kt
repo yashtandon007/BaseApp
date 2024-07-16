@@ -4,6 +4,5 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class NoteApp: Application()
-//master
-//master
+class NoteApp: Application() //child
+//child
