@@ -5,8 +5,4 @@ import dagger.hilt.android.HiltAndroidApp
 //papa2
 @HiltAndroidApp
 class NoteApp: Application() //child
-//papa
-
-//beta
-
-//man change in app
+//boss 1
