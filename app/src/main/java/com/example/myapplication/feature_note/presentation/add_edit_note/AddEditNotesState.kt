@@ -1,6 +1,7 @@
 package com.example.myapplication.feature_note.presentation.add_edit_note
 
 //nail1
+//nail2
 data class AddEditNotesState(
     val title: NoteTextFieldState,
     val content: NoteTextFieldState,
